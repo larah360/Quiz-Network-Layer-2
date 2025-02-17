@@ -1,0 +1,139 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+
+const questions = [
+  {
+    question: "Qual é o protocolo principal da Camada de Rede?",
+    options: [
+      "A) TCP",
+      "B) IP",
+      "C) HTTP",
+      "D) ARP",
+      "E) DNS",
+    ],
+    answer: 1,
+    explanation: "O protocolo IP (Internet Protocol) é o principal protocolo da Camada de Rede, responsável pelo endereçamento e roteamento de pacotes."
+  },
+  {
+    question: "O que significa NAT na Camada de Rede?",
+    options: [
+      "A) Network Address Translation",
+      "B) Node Allocation Table",
+      "C) Network Access Transfer",
+      "D) New Addressing Technique",
+      "E) None of the above",
+    ],
+    answer: 0,
+    explanation: "NAT (Network Address Translation) permite a conversão de endereços IP privados em públicos para acesso à Internet."
+  },
+  {
+    question: "Qual camada do modelo OSI é responsável pelo roteamento?",
+    options: [
+      "A) Física",
+      "B) Enlace de Dados",
+      "C) Rede",
+      "D) Transporte",
+      "E) Aplicação",
+    ],
+    answer: 2,
+    explanation: "A Camada de Rede é responsável pelo roteamento e entrega dos pacotes entre redes diferentes."
+  },
+  {
+    question: "O que o protocolo ICMP faz?",
+    options: [
+      "A) Transfere arquivos",
+      "B) Gerencia rotas",
+      "C) Envia mensagens de erro e diagnóstico",
+      "D) Estabelece conexões seguras",
+      "E) Converte endereços MAC",
+    ],
+    answer: 2,
+    explanation: "O ICMP (Internet Control Message Protocol) é usado para enviar mensagens de erro e diagnóstico, como o comando 'ping'."
+  },
+  {
+    question: "Qual é a unidade de dados na Camada de Rede?",
+    options: [
+      "A) Quadro",
+      "B) Segmento",
+      "C) Pacote",
+      "D) Bit",
+      "E) Mensagem",
+    ],
+    answer: 2,
+    explanation: "Na Camada de Rede, os dados são encapsulados em pacotes, que contêm informações de endereçamento e roteamento."
+  }
+];
+
+export default function Quiz() {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [score, setScore] = useState(0);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [completed, setCompleted] = useState(false);
+
+  const handleAnswerClick = (index) => {
+    if (showExplanation) return;
+    setSelectedAnswer(index);
+    if (index === questions[currentQuestion].answer) {
+      setScore(score + 1);
+      setShowExplanation(true);
+    }
+  };
+
+  const nextQuestion = () => {
+    if (currentQuestion + 1 < questions.length) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(null);
+      setShowExplanation(false);
+    } else {
+      setCompleted(true);
+    }
+  };
+
+  const restartQuiz = () => {
+    setCurrentQuestion(0);
+    setSelectedAnswer(null);
+    setShowExplanation(false);
+    setScore(0);
+    setCompleted(false);
+  };
+
+  return (
+    <div className="p-4 max-w-lg mx-auto">
+      <Card>
+        <CardContent className="p-4">
+          {completed ? (
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">Quiz Finalizado!</h2>
+              <p className="mt-4 text-lg">Sua pontuação: {score} / {questions.length}</p>
+              <p className="mt-2 text-green-600 font-semibold">
+                {score === questions.length ? "Parabéns! Você acertou todas!" : score >= questions.length / 2 ? "Bom trabalho! Continue estudando." : "Não desista! Tente novamente."}
+              </p>
+              <Button onClick={restartQuiz} className="mt-4 w-full">Reiniciar Quiz</Button>
+            </div>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold">{questions[currentQuestion].question}</h2>
+              <div className="mt-4 space-y-2">
+                {questions[currentQuestion].options.map((option, index) => (
+                  <motion.button 
+                    key={index} 
+                    onClick={() => handleAnswerClick(index)} 
+                    className={`w-full p-2 text-left border rounded-lg hover:bg-gray-200 ${selectedAnswer === index ? (index === questions[currentQuestion].answer ? 'bg-green-200' : 'bg-red-200') : ''}`}
+                  >
+                    {option}
+                  </motion.button>
+                ))}
+              </div>
+              {selectedAnswer !== null && selectedAnswer !== questions[currentQuestion].answer && <p className="mt-4 p-2 bg-red-100 text-red-800">Tente novamente</p>}
+              {showExplanation && <p className="mt-4 p-2 bg-green-100 text-green-800">{questions[currentQuestion].explanation}</p>}
+              <Button onClick={nextQuestion} className="mt-4 w-full">Próxima Pergunta</Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
